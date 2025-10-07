@@ -299,7 +299,7 @@ async function startXeonBotInc() {
 ╚═▣══════════▣╝
 ▣ Time: ${new Date().toLocaleString()}
 ▣ Status: Online and Ready!
-▣ Current prefix is: [${currentPrefix}]
+▣ Current prefix is: [ ${currentPrefix} ]
 ▣ ✅Do ur best to join below channel`,
   contextInfo: {
     externalAdReply: {
