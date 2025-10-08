@@ -1233,13 +1233,11 @@ Promoted by GIFT-MD BOT 🤖`;
     description: 'Tag all non-admin members in the group',
     usage: '.tagnotadmin',
     execute: async (sock, message, args, context) => {
-        const { reply, react, isSenderAdmin, isBotAdmin,isGroup, chatId } = context;
+        const { reply, react, isSenderAdmin, isBotAdmin,isGroup, chatId,senderId } = context;
         try {
             if (!isGroup) {
                 return await reply('❌ This command can only be used in groups!');
             }
-
-            const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
 
             if (!isBotAdmin) {
                 await react('❌');
@@ -1289,7 +1287,7 @@ Promoted by GIFT-MD BOT 🤖`;
     description: 'Tag all non-admin members in the group',
     usage: '.tagnotadmin',
     execute: async (sock, message, args, context) => {
-        const { reply, react, isSenderAdmin,isGroup, isBotAdmin, chatId } = context;
+        const { reply, react, senderId,isSenderAdmin,isGroup, isBotAdmin, chatId } = context;
         try {
             if (!isGroup) {
                 return await reply('❌ This command can only be used in groups!');
