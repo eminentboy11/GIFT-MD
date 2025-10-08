@@ -13,7 +13,7 @@ import {
     removeSudo,
 } from '../lib/database.js';
 import * as db from '../lib/database.js';
-import { syncMode } from './topmembers.js';
+import { syncMode } from './SPECIAL.js';
 const fsp = fs.promises;
 import axios from 'axios';
 import path from 'path';
