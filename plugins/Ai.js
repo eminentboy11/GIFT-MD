@@ -112,7 +112,7 @@ export default[
             await sock.sendMessage(chatId, {
                 video: { url: videoUrl },
                 mimetype: 'video/mp4',
-                caption: `✨ *Sora AI Video*\n\n📝 Prompt: ${input}`
+                caption: `✨ Sora AI Video\n\n📝 Prompt: ${input}`
             }, { quoted: message });
 
         } catch (error) {
