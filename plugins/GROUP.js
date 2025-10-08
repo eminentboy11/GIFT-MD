@@ -1,4 +1,5 @@
 import settings from '../settings.js';
+import isAdmin from '../lib/isAdmin.js';
 export default [ 
 {
     name: "remove",
@@ -310,7 +311,7 @@ Add Members Results\n\n📊 Summary:\n✅ Successfully added: ${successCount}\n�
 
     name: "close",
 
-    aliases: ["closegroup", "lock"],
+    aliases: ["closetime"],
 
     description: "Close group (only admins can send messages)",
 
@@ -405,7 +406,7 @@ Add Members Results\n\n📊 Summary:\n✅ Successfully added: ${successCount}\n�
 
     name: "open",
 
-    aliases: ["opengroup", "unlock"],
+    aliases: ["opentime"],
 
     description: "Open group (allow all members to send messages)",
 
@@ -1224,5 +1225,118 @@ Promoted by GIFT-MD BOT 🤖`;
             await reply('Failed to tag all members.');
         }
     }
-    }                 
+    },
+     {
+    name: 'tagnotadmin',
+    aliases: [],
+    category: 'GROUP',
+    description: 'Tag all non-admin members in the group',
+    usage: '.tagnotadmin',
+    execute: async (sock, message, args, context) => {
+        const { chatId, senderId, reply, react, isGroup } = context;
+
+        try {
+            if (!isGroup) {
+                return await reply('❌ This command can only be used in groups!');
+            }
+
+            const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
+
+            if (!isBotAdmin) {
+                await react('❌');
+                return await reply('❌ Please make the bot an admin first.');
+            }
+
+            if (!isSenderAdmin) {
+                await react('🚫');
+                return await reply('🚫 Only admins can use this command.');
+            }
+
+            await react('⏳');
+
+            const groupMetadata = await sock.groupMetadata(chatId);
+            const participants = groupMetadata.participants || [];
+
+            const nonAdmins = participants.filter(p => !p.admin).map(p => p.id);
+            
+            if (nonAdmins.length === 0) {
+                await react('ℹ️');
+                return await reply('ℹ️ No non-admin members to tag.');
+            }
+
+            let text = '🔊 Tagging All Members:\n\n';
+            nonAdmins.forEach(jid => {
+                text += `@${jid.split('@')[0]}\n`;
+            });
+
+            await sock.sendMessage(chatId, { 
+                text, 
+                mentions: nonAdmins 
+            }, { quoted: message });
+
+            await react('✅');
+
+        } catch (error) {
+            console.error('[TAGNOTADMIN] Error:', error.message);
+            await react('❌');
+            await reply('⚠️ Failed to tag non-admin members.');
+        }
+    }
+},
+    {
+    name: 'tagadmin',
+    aliases: [],
+    category: 'GROUP',
+    description: 'Tag all non-admin members in the group',
+    usage: '.tagnotadmin',
+    execute: async (sock, message, args, context) => {
+        const { chatId, senderId, reply, react, isGroup } = context;
+
+        try {
+            if (!isGroup) {
+                return await reply('❌ This command can only be used in groups!');
+            }
+
+            const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
+
+            if (!isBotAdmin) {
+                await react('❌');
+                return await reply('❌ Please make the bot an admin first.');
+            }
+
+            if (!isSenderAdmin) {
+                await react('🚫');
+                return await reply('🚫 Only admins can use this command.');
+            }
+
+            await react('⏳');
+
+            const groupMetadata = await sock.groupMetadata(chatId);
+            const participants = groupMetadata.participants || [];
+
+            const admins = participants.filter(p => p.admin);
+            if (nonAdmins.length === 0) {
+                await react('ℹ️');
+                return await reply('ℹ️ No admin members to tag.');
+            }
+
+            let text = '🔊 Tagging All Admins:\n\n';
+            Admins.forEach(jid => {
+                text += `@${jid.split('@')[0]}\n`;
+            });
+
+            await sock.sendMessage(chatId, { 
+                text, 
+                mentions: Admins 
+            }, { quoted: message });
+
+            await react('✅');
+
+        } catch (error) {
+            console.error('[TAGADMIN] Error:', error.message);
+            await react('❌');
+            await reply('⚠️ Failed to tag admin members.');
+        }
+    }
+}
     ];
