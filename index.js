@@ -11,7 +11,7 @@ import { Boom } from '@hapi/boom';
 const currentPrefix = (global.prefix === undefined || global.prefix === null) ? '.' : global.prefix;
 import FileType from 'file-type';
 import axios from 'axios';
-import { handleMessages, handleGroupParticipantUpdate, handleStatus, restorePresenceSettings, initializeCallHandler, handleMessageDelete } from './main.js';
+import { handleMessages, handleGroupParticipantUpdate, handleStatus, restorePresenceSettings, initializeCallHandler} from './main.js';
 import awesomePhoneNumber from 'awesome-phonenumber';
 import PhoneNumber from 'awesome-phonenumber';
 import { imageToWebp, videoToWebp, writeExifImg, writeExifVid } from './lib/exif.js';
@@ -172,14 +172,8 @@ async function startXeonBotInc() {
             return decode.user && decode.server && decode.user + '@' + decode.server || jid
         } else return jid
     }
-        // Antidelete handler
-    XeonBotInc.ev.on('messages.delete', async (messageUpdate) => {
-        try {
-            await handleMessageDelete(XeonBotInc, messageUpdate);
-        } catch (err) {
-            console.error("Error in messages.delete:", err);
-        }
-    });
+        
+    
     XeonBotInc.ev.on('contacts.update', update => {
         for (let contact of update) {
             let id = XeonBotInc.decodeJid(contact.id)
