@@ -1280,14 +1280,15 @@ Promoted by GIFT-MD BOT 🤖`;
         }
     }
 },
-    {
+ {
     name: 'tagadmin',
     aliases: [],
     category: 'GROUP',
-    description: 'Tag all non-admin members in the group',
-    usage: '.tagnotadmin',
+    description: 'Tag all admin members in the group',
+    usage: '.tagadmin',
     execute: async (sock, message, args, context) => {
-        const { reply, react, senderId,isSenderAdmin,isGroup, isBotAdmin, chatId } = context;
+        const { reply, react, senderId, isSenderAdmin, isGroup, isBotAdmin, chatId } = context;
+
         try {
             if (!isGroup) {
                 return await reply('❌ This command can only be used in groups!');
@@ -1306,23 +1307,31 @@ Promoted by GIFT-MD BOT 🤖`;
             await react('⏳');
 
             const groupMetadata = await sock.groupMetadata(chatId);
-const participants = groupMetadata.participants || [];
+            const participants = groupMetadata.participants || [];
 
-const admins = participants.filter(p => p.admin);
-if (admins.length === 0) {
-    await react('ℹ️');
-    return await reply('ℹ️ No admin members to tag.');
-}
+            // ✅ Filter admins
+            const admins = participants.filter(p => p.admin);
 
-let text = '🔊 Tagging All Admins:\n\n';
-admins.forEach(jid => {
-    text += `@${jid.split('@')[0]}\n`;
-});
+            if (admins.length === 0) {
+                await react('ℹ️');
+                return await reply('ℹ️ No admin members to tag.');
+            }
 
-await sock.sendMessage(chatId, { 
-    text, 
-    mentions: admins 
-}, { quoted: message });
+            // ✅ Build mention text
+            let text = '🔊 *Tagging All Admins:*\n\n';
+            admins.forEach(p => {
+                text += `@${p.id.split('@')[0]}\n`;
+            });
+
+            // ✅ Send message with mentions
+            await sock.sendMessage(
+                chatId,
+                {
+                    text,
+                    mentions: admins.map(a => a.id)
+                },
+                { quoted: message }
+            );
 
             await react('✅');
 
