@@ -649,74 +649,10 @@ execute: async (sock, message, args, context) => {
     }
 
   },
-
-  
-
-  {
-
-    name: 'song',
-
-    category: 'downloader',
-
-    execute: async (sock, message, args, context) => {
-
-      const text = args.slice(1).join(' ');
-
-      if (!text) return context.reply('*Please provide a song name!*');
-
-      try {
-
-        const search = await yts(text);
-
-        if (!search || search.all.length === 0) return context.reply('*The song you are looking for was not found.*');
-
-        const video = search.all[0];
-
-        
-
-        // Using a simple YouTube to MP3 API
-
-        const apiUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(video.url)}`;
-
-        const response = await fetch(apiUrl);
-
-        const data = await response.json();
-
-        
-
-        if (data.status && data.data?.downloadLink) {
-
-          await sock.sendMessage(context.chatId, {
-
-            audio: { url: data.data.downloadLink },
-
-            mimetype: 'audio/mpeg',
-
-            fileName: `${video.title}.mp3`
-
-          }, { quoted: message });
-
-        } else {
-
-          throw new Error('API returned no download link');
-
-        }
-
-      } catch (error) {
-
-        console.error('song command failed:', error);
-
-        context.reply("❌ Error downloading song. Please try again later.");
-
-      }
-
-    }
-
-  },
      
 {
     name: "play",
-    aliases: ["p", "y"],
+    aliases: ["song"],
     category: "downloader",
     desc: "Download and send audio from YouTube",
 
@@ -782,15 +718,15 @@ execute: async (sock, message, args, context) => {
             // Send song info
             await context.replyPlain({
                 image: { url: thumbnail },
-                caption: `🎵 *${title}*
-⏱️ *Duration:* ${duration}
-👤 *Artist:* ${author}
-👁️ *Views:* ${views}
-🔗 *Link:* ${urlYt}
+                caption: `🎵 ${title}
+⏱️ Duration: ${duration}
+👤 Artist: ${author}
+👁️ Views: ${views}
+🔗 Link: ${urlYt}
 
 Reply with:
-🅰️ - For *Audio Format* 🎵
-🇩 - For *Document Format* 📄`
+🅰️ - For Audio Format 🎵
+🇩 - For Document Format 📄`
             }, { quoted: msg });
 
             // Store download info for follow-up
