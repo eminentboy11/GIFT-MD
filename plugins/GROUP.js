@@ -1309,7 +1309,7 @@ Promoted by GIFT-MD BOT 🤖`;
             const participants = groupMetadata.participants || [];
 
             const admins = participants.filter(p => p.admin);
-            if (nonAdmins.length === 0) {
+            if (Admins.length === 0) {
                 await react('ℹ️');
                 return await reply('ℹ️ No admin members to tag.');
             }
