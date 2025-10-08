@@ -713,200 +713,112 @@ execute: async (sock, message, args, context) => {
     }
 
   },
-     {
-
+     
+{
     name: "play",
-
     aliases: ["p", "y"],
-
     category: "downloader",
-
     desc: "Download and send audio from YouTube",
 
     async execute(sock, msg, args, context) {
-
-          await context.react('🎵');
+        await context.react('🎵');
 
         const from = msg.key.remoteJid;
-
         const text = args.slice(1).join(" ");
 
-        
-
         if (!text) {
-
             return await context.reply("❌ What song do you want to download?\n\nExample: `.play spectre`");
-
         }
 
         try {
-
             const { videos } = await yts(text);
-
             if (!videos || videos.length === 0) {
-
                 return await context.reply("❌ No songs found!");
-
             }
 
             await context.replyPlain("🎵 Please wait, fetching your song...");
 
             const video = videos[0];
+            const urlYt = video.url;
 
-            const urlYt = video.url;            
-
-            // Try the Keith API
-
+            // Call Keith API
             const apiUrl = `https://apis-keith.vercel.app/download/dlmp3?url=${encodeURIComponent(urlYt)}`;
-
             const response = await axios.get(apiUrl, {
-
                 timeout: 45000,
-
-                headers: {
-
-                    'User-Agent': 'WhatsApp-Bot/1.0'
-
-                }
-
+                headers: { 'User-Agent': 'WhatsApp-Bot/1.0' }
             });
-
-           
 
             const data = response.data;
 
-            // Check the correct path based on your debug output
-
-            if (!data || !data.status) {
-
-                return await context.replyPlain("❌ API returned an error status.");
-
+            // ✅ Updated JSON structure check
+            if (!data.status || !data.result || !data.result.data) {
+                return await context.replyPlain("❌ Failed to fetch song data from API.");
             }
 
-            
+            const song = data.result.data;
 
-            if (!data.result || !data.result.success) {
-
-                return await context.replyPlain("❌ API request was not successful.");
-
+            if (!song.downloadUrl) {
+                return await context.replyPlain("❌ No download URL found in API response.");
             }
 
-            
-
-            // The correct path is data.result.data.downloadUrl
-
-            if (!data.result.data || !data.result.data.downloadUrl) {
-
-                return await context.reply("❌ No download URL found in API response.");
-
-            }
-
-            // Format duration properly
-
+            // Helpers
             const formatDuration = (seconds) => {
-
                 const mins = Math.floor(seconds / 60);
-
                 const secs = seconds % 60;
-
                 return `${mins}:${secs.toString().padStart(2, '0')}`;
-
             };
-
-            // Format view count
 
             const formatViews = (views) => {
-
                 return views ? views.toLocaleString() : 'Unknown';
-
             };
 
-            // Create rich message format
-
-            const title = data.result.data.title || video.title;
-
-            const duration = formatDuration(video.duration.seconds);
-
+            // Info
+            const title = song.title || video.title;
+            const duration = formatDuration(video.duration.seconds || song.duration);
             const views = formatViews(video.views);
-
             const author = video.author?.name || 'Unknown Artist';
+            const thumbnail = song.thumbnail || video.thumbnail;
 
-            const thumbnail = video.thumbnail;
-
-            
-
+            // Send song info
             await context.replyPlain({
-
                 image: { url: thumbnail },
-
-                caption: `🎵 ${title}
-
-⏱️ Duration: ${duration}
-
-👤 ${author}
-
-👁️ ${views} views
-
-🔗 ${urlYt}
+                caption: `🎵 *${title}*
+⏱️ *Duration:* ${duration}
+👤 *Artist:* ${author}
+👁️ *Views:* ${views}
+🔗 *Link:* ${urlYt}
 
 Reply with:
-
-🅰️ - For Audio Format 🎵
-
-🇩 - For Document Format 📄`
-
+🅰️ - For *Audio Format* 🎵
+🇩 - For *Document Format* 📄`
             }, { quoted: msg });
 
-            // Store the download info for later use when user replies
-
+            // Store download info for follow-up
             global.playQueue = global.playQueue || {};
-
             global.playQueue[from] = {
-
-                audioUrl: data.result.data.downloadUrl, // ✅ Fixed path
-
+                audioUrl: song.downloadUrl,
                 title: title,
-
                 urlYt: urlYt,
-
                 audioSent: false,
-
                 documentSent: false
-
             };
 
-           
-
         } catch (error) {
-
             console.error('❌ Error in play command:', error);
-
-            
 
             let errorMessage = "❌ Download failed. Please try again later.";
 
-            
-
             if (error.code === 'ENOTFOUND') {
-
                 errorMessage = "❌ Network error. Check your internet connection.";
-
             } else if (error.response?.status === 429) {
-
                 errorMessage = "❌ Too many requests. Please wait a moment and try again.";
-
             } else if (error.message.includes('timeout')) {
-
                 errorMessage = "❌ Request timeout. The server took too long to respond.";
-
             }
 
             await context.reply(errorMessage);
-
         }
-
     }
-
 },
    {
 
