@@ -1483,5 +1483,99 @@ const { isSenderAdmin, isBotAdmin, chatId, senderId, reply, react, isGroup } = c
             await reply('❌ Failed to update group description.');
         }
     }
+},
+ {
+    name: 'resetlink',
+    aliases: ['revoke', 'newlink'],
+    category: 'GROUP',
+    description: 'Reset group invite link (Admin only)',
+    usage: '.resetlink',
+    execute: async (sock, message, args, context) => {
+        const { chatId, senderId, reply, isSenderAdmin, isBotAdmin,react, isGroup } = context;
+
+        if (!isGroup) {
+            return await reply('❌ This command can only be used in groups.');
+        }
+
+        if (!isBotAdmin) {
+            await react('❌');
+            return await reply('❌ Please make the bot an admin first.');
+        }
+
+        if (!isSenderAdmin) {
+            await react('🚫');
+            return await reply('🚫 Only group admins can use this command.');
+        }
+
+        try {
+            await react('⏳');
+            await sock.groupRevokeInvite(chatId);
+            const code = await sock.groupInviteCode(chatId);
+            await react('✅');
+            await reply(`🔗 *New group invite link:*\n\nhttps://chat.whatsapp.com/${code}\n\n_Previous link has been revoked!_`);
+        } catch (e) {
+            console.error('[RESETLINK] Error:', e.message);
+            await react('❌');
+            await reply('❌ Failed to reset group link.');
+        }
+    }
+},
+{
+    name: 'poll',
+    aliases: ['createpoll', 'vote'],
+    category: 'GROUP',
+    description: 'Create a poll in the group (Admin only)',
+    usage: '.poll "Question?" | Option1, Option2, Option3',
+    execute: async (sock, message, args, context) => {
+        const { chatId, senderId, reply, react,isSenderAdmin, isBotAdmin, isGroup } = context;
+
+        if (!isGroup) {
+            return await reply('❌ This command can only be used in groups.');
+        }
+
+        if (!isBotAdmin) {
+            await react('❌');
+            return await reply('❌ Please make the bot an admin first.');
+        }
+
+        if (!isSenderAdmin) {
+            await react('🚫');
+            return await reply('🚫 Only group admins can use this command.');
+        }
+
+        const text = args.slice(1).join(' ').trim();
+
+        if (!text) {
+            return await reply('📊 Usage: .poll "Question?" | Option1, Option2, Option3\n\nExample: .poll "Favorite color?" | Red, Blue, Green');
+        }
+
+        const [questionPart, optionsPart] = text.split('|').map(t => t.trim());
+        
+        if (!questionPart || !optionsPart) {
+            return await reply('❌ Invalid format.\n\n📊 Example: .poll "Favorite color?" | Red, Blue, Green');
+        }
+
+        const options = optionsPart.split(',').map(opt => opt.trim()).filter(opt => opt.length);
+        
+        if (options.length < 2) {
+            return await reply('❌ Please provide at least 2 options.');
+        }
+
+        try {
+            await react('⏳');
+            await sock.sendMessage(chatId, {
+                poll: {
+                    name: questionPart,
+                    values: options
+                }
+            });
+            await react('✅');
+            await reply('✅ Poll created successfully!');
+        } catch (e) {
+            console.error('[POLL] Error:', e.message);
+            await react('❌');
+            await reply('❌ Failed to create poll.');
+        }
+    }
 }
     ];
