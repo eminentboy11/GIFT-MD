@@ -1295,8 +1295,6 @@ Promoted by GIFT-MD BOT 🤖`;
                 return await reply('❌ This command can only be used in groups!');
             }
 
-            const { isSenderAdmin, isBotAdmin } = await isAdmin(sock, chatId, senderId);
-
             if (!isBotAdmin) {
                 await react('❌');
                 return await reply('❌ Please make the bot an admin first.');
