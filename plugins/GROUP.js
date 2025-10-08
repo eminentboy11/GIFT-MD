@@ -1,5 +1,8 @@
 import settings from '../settings.js';
 import isAdmin from '../lib/isAdmin.js';
+import { downloadContentFromMessage } from '@whiskeysockets/baileys';
+import fs from 'fs';
+import path from 'path';
 export default [ 
 {
     name: "remove",
@@ -1318,7 +1321,7 @@ Promoted by GIFT-MD BOT 🤖`;
             }
 
             // ✅ Build mention text
-            let text = '🔊 *Tagging All Admins:*\n\n';
+            let text = '🔊 Tagging All Admins:\n\n';
             admins.forEach(p => {
                 text += `@${p.id.split('@')[0]}\n`;
             });
@@ -1339,6 +1342,145 @@ Promoted by GIFT-MD BOT 🤖`;
             console.error('[TAGADMIN] Error:', error.message);
             await react('❌');
             await reply('⚠️ Failed to tag admin members.');
+        }
+    }
+},
+
+{
+    name: 'setgpp',
+    aliases: ['setgphoto'],
+    category: 'GROUP',
+    description: 'Change group profile picture (Admin only)',
+    usage: 'Reply to an image with .setgpp',
+    execute: async (sock, message, args, context) => {
+        const { isSenderAdmin, isBotAdmin, chatId, senderId, reply, react, isGroup } = context;
+
+        if (!isGroup) {
+            return await reply('❌ This command can only be used in groups.');
+        }
+
+        if (!isBotAdmin) {
+            await react('❌');
+            return await reply('❌ Please make the bot an admin first.');
+        }
+
+        if (!isSenderAdmin) {
+            await react('🚫');
+            return await reply('🚫 Only group admins can use this command.');
+        }
+
+        const quoted = message.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+        const imageMessage = quoted?.imageMessage || quoted?.stickerMessage;
+        
+        if (!imageMessage) {
+            return await reply('🖼️ Reply to an image or sticker with .setgpp');
+        }
+
+        try {
+            await react('⏳');
+
+            const tmpDir = path.join(process.cwd(), 'tmp');
+            if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+
+            const stream = await downloadContentFromMessage(imageMessage, 'image');
+            let buffer = Buffer.from([]);
+            for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
+
+            const imgPath = path.join(tmpDir, `gpp_${Date.now()}.jpg`);
+            fs.writeFileSync(imgPath, buffer);
+
+            await sock.updateProfilePicture(chatId, { url: imgPath });
+            
+            try { fs.unlinkSync(imgPath); } catch (_) {}
+            
+            await react('✅');
+            await reply('✅ Group profile photo updated successfully!');
+        } catch (e) {
+            console.error('[SETGPP] Error:', e.message);
+            await react('❌');
+            await reply('❌ Failed to update group profile photo.');
+        }
+    }
+},
+{
+    name: 'setgname',
+    aliases: [],
+    category: 'GROUP',
+    description: 'Change group name (Admin only)',
+    usage: '.setgname <new name>',
+    execute: async (sock, message, args, context) => {
+const { isSenderAdmin, isBotAdmin, chatId, senderId, reply, react, isGroup } = context;
+
+        if (!isGroup) {
+            return await reply('❌ This command can only be used in groups.');
+        }
+
+        if (!isBotAdmin) {
+            await react('❌');
+            return await reply('❌ Please make the bot an admin first.');
+        }
+
+        if (!isSenderAdmin) {
+            await react('🚫');
+            return await reply('🚫 Only group admins can use this command.');
+        }
+
+        const name = args.slice(1).join(' ').trim();
+        
+        if (!name) {
+            return await reply('🏷️ Usage: .setgname <new name>\n\nExample: .setgname Cool Squad 2025');
+        }
+
+        try {
+            await react('⏳');
+            await sock.groupUpdateSubject(chatId, name);
+            await react('✅');
+            await reply(`✅ Group name updated to: *${name}*`);
+        } catch (e) {
+            console.error('[SETGNAME] Error:', e.message);
+            await react('❌');
+            await reply('❌ Failed to update group name.');
+        }
+    }
+},
+ {
+    name: 'setgdesc',
+    aliases: ['setdesc', 'gdesc'],
+    category: 'GROUP',
+    description: 'Change group description (Admin only)',
+    usage: '.setgdesc <new description>',
+    execute: async (sock, message, args, context) => {
+        const { isSenderAdmin, isBotAdmin, chatId, senderId, reply, react, isGroup } = context;
+
+        if (!isGroup) {
+            return await reply('❌ This command can only be used in groups.');
+        }
+
+        if (!isBotAdmin) {
+            await react('❌');
+            return await reply('❌ Please make the bot an admin first.');
+        }
+
+        if (!isSenderAdmin) {
+            await react('🚫');
+            return await reply('🚫 Only group admins can use this command.');
+        }
+
+        const desc = args.slice(1).join(' ').trim();
+        
+        if (!desc) {
+            return await reply('📝 Usage: .setgdesc <description>\n\nExample: .setgdesc Welcome to our amazing group!');
+        }
+
+        try {
+            await react('⏳');
+            await sock.groupUpdateDescription(chatId, desc);
+            await react('✅');
+            await reply('✅ Group description updated successfully!');
+        } catch (e) {
+            console.error('[SETGDESC] Error:', e.message);
+            await react('❌');
+            await reply('❌ Failed to update group description.');
         }
     }
 }
