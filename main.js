@@ -409,6 +409,90 @@ async function handleStatus(sock, statusUpdate) {
     }
 }
 
+// Add this function
+export async function handleMessageDelete(sock, messageUpdate) {
+    try {
+        const antideleteMode = getSetting('antidelete_mode', 'off');
+        
+        if (antideleteMode === 'off') return;
+
+        const { messages } = messageUpdate;
+        
+        for (const msg of messages) {
+            const chatId = msg.key.remoteJid;
+            const messageId = msg.key.id;
+            const deleterId = msg.key.participant || msg.key.remoteJid;
+            
+            // Get owner number
+            const ownerNumber = getSetting('ownerNumber', '').split('@')[0];
+            const deleterNumber = deleterId.split('@')[0].split(':')[0];
+            
+            // Skip if owner deleted the message
+            if (deleterNumber === ownerNumber) {
+                console.log('⏭️ Skipping owner deleted message');
+                continue;
+            }
+
+            // Check mode settings
+            const isGroup = chatId.endsWith('@g.us');
+            const isPM = !isGroup;
+            
+            if (antideleteMode === 'pm' && !isPM) continue;
+            if (antideleteMode === 'gc' && !isGroup) continue;
+            
+            // Try to recover from message backup
+            const backupKey = `${chatId}_${messageId}`;
+            const savedMessage = global.messageBackup?.[chatId]?.[messageId];
+            
+            if (savedMessage) {
+                const deleterName = savedMessage.pushName || deleterNumber;
+                const chatType = isGroup ? 'Group' : 'Private';
+                
+                let recoveryText = `🗑️ *Anti-Delete Alert*\n\n`;
+                recoveryText += `👤 Deleted by: @${deleterNumber}\n`;
+                recoveryText += `💬 Chat Type: ${chatType}\n`;
+                recoveryText += `⏰ Time: ${new Date().toLocaleString()}\n\n`;
+                recoveryText += `📝 *Deleted Message:*\n`;
+                
+                // Handle different message types
+                const msgContent = savedMessage.message;
+                
+                if (msgContent.conversation) {
+                    recoveryText += msgContent.conversation;
+                } else if (msgContent.extendedTextMessage?.text) {
+                    recoveryText += msgContent.extendedTextMessage.text;
+                } else if (msgContent.imageMessage?.caption) {
+                    recoveryText += msgContent.imageMessage.caption || '_Image_';
+                } else if (msgContent.videoMessage?.caption) {
+                    recoveryText += msgContent.videoMessage.caption || '_Video_';
+                } else if (msgContent.imageMessage) {
+                    recoveryText += '_[Image]_';
+                } else if (msgContent.videoMessage) {
+                    recoveryText += '_[Video]_';
+                } else if (msgContent.audioMessage) {
+                    recoveryText += '_[Audio]_';
+                } else if (msgContent.documentMessage) {
+                    recoveryText += '_[Document]_';
+                } else if (msgContent.stickerMessage) {
+                    recoveryText += '_[Sticker]_';
+                } else {
+                    recoveryText += '_[Unsupported message type]_';
+                }
+
+                // Send recovery message
+                await sock.sendMessage(chatId, {
+                    text: recoveryText,
+                    mentions: [deleterId]
+                });
+
+                console.log(`✅ Recovered deleted message from ${deleterNumber} in ${chatId}`);
+            }
+        }
+    } catch (error) {
+        console.error('[ANTIDELETE] Error:', error.message);
+    }
+}
+
 export {
     handleMessages,
     handleGroupParticipantUpdate,
