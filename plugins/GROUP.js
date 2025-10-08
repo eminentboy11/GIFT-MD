@@ -1306,23 +1306,23 @@ Promoted by GIFT-MD BOT 🤖`;
             await react('⏳');
 
             const groupMetadata = await sock.groupMetadata(chatId);
-            const participants = groupMetadata.participants || [];
+const participants = groupMetadata.participants || [];
 
-            const admins = participants.filter(p => p.admin);
-            if (admins.length === 0) {
-                await react('ℹ️');
-                return await reply('ℹ️ No admin members to tag.');
-            }
+const admins = participants.filter(p => p.admin);
+if (admins.length === 0) {
+    await react('ℹ️');
+    return await reply('ℹ️ No admin members to tag.');
+}
 
-            let text = '🔊 Tagging All Admins:\n\n';
-            admins.forEach(jid => {
-                text += `@${jid.split('@')[0]}\n`;
-            });
+let text = '🔊 Tagging All Admins:\n\n';
+admins.forEach(jid => {
+    text += `@${jid.split('@')[0]}\n`;
+});
 
-            await sock.sendMessage(chatId, { 
-                text, 
-                mentions: admins 
-            }, { quoted: message });
+await sock.sendMessage(chatId, { 
+    text, 
+    mentions: admins 
+}, { quoted: message });
 
             await react('✅');
 
