@@ -98,7 +98,7 @@ const message = messages[0];
     
     // ... rest of your code
 
-const chatId = message.key.remoteJid;
+//const chatId = message.key.remoteJid;
 const senderId = message.key.participant || message.key.remoteJid;
 const isGroup = chatId.endsWith('@g.us');
 const isChannel = chatId.endsWith('@newsletter'); // Add this line
