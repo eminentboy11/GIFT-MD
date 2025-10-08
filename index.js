@@ -172,7 +172,9 @@ async function startXeonBotInc() {
             return decode.user && decode.server && decode.user + '@' + decode.server || jid
         } else return jid
     }
-
+    XeonBotInc.ev.on('messages.delete', async (messageUpdate) => {
+    await handleMessageDelete(sock, messageUpdate);
+});
     XeonBotInc.ev.on('contacts.update', update => {
         for (let contact of update) {
             let id = XeonBotInc.decodeJid(contact.id)
