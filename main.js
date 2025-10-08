@@ -72,33 +72,9 @@ if (type !== 'notify') return;
 const message = messages[0];  
     if (!message?.message) return;  
 
-    // === BACKUP MESSAGE FOR ANTIDELETE ===
-    const chatId = message.key.remoteJid;
-    const messageId = message.key.id;
+const currentPrefix = global.prefix;
     
-    if (!global.messageBackup) global.messageBackup = {};
-    if (!global.messageBackup[chatId]) global.messageBackup[chatId] = {};
-    
-    global.messageBackup[chatId][messageId] = {
-        message: message.message,
-        key: message.key,
-        pushName: message.pushName,
-        timestamp: Math.floor(Date.now() / 1000)
-    };
-    
-    // Cleanup old messages (keep last 100 per chat)
-    const messageIds = Object.keys(global.messageBackup[chatId]);
-    if (messageIds.length > 100) {
-        const oldestId = messageIds[0];
-        delete global.messageBackup[chatId][oldestId];
-    }
-    // === END BACKUP ===
-
-    const currentPrefix = global.prefix;
-    
-    // ... rest of your code
-
-//const chatId = message.key.remoteJid;
+const chatId = message.key.remoteJid;
 const senderId = message.key.participant || message.key.remoteJid;
 const isGroup = chatId.endsWith('@g.us');
 const isChannel = chatId.endsWith('@newsletter'); // Add this line
@@ -433,71 +409,6 @@ async function handleStatus(sock, statusUpdate) {
     }
 }
 
-    // === ANTIDELETE HANDLER ===
-export async function handleMessageDelete(sock, messageUpdate) {
-    try {
-        const antideleteMode = getSetting('antidelete_mode', 'off');
-        
-        if (antideleteMode === 'off') return;
-
-        for (const msg of messageUpdate.messages) {
-            const chatId = msg.key.remoteJid;
-            const messageId = msg.key.id;
-            const deleterId = msg.key.participant || msg.key.remoteJid;
-            
-            // Skip if owner deleted
-            const ownerNumber = getSetting('ownerNumber', '').split('@')[0];
-            const deleterNumber = deleterId.split('@')[0].split(':')[0];
-            
-            if (deleterNumber === ownerNumber) {
-                console.log('⏭️ [ANTIDELETE] Skipping owner deleted message');
-                continue;
-            }
-
-            // Check mode
-            const isGroup = chatId.endsWith('@g.us');
-            const isPM = !isGroup;
-            
-            if (antideleteMode === 'pm' && !isPM) continue;
-            if (antideleteMode === 'gc' && !isGroup) continue;
-            
-            // Recover message
-            const savedMessage = global.messageBackup?.[chatId]?.[messageId];
-            
-            if (savedMessage) {
-                let recoveryText = `🗑️ *Anti-Delete Alert*\n\n`;
-                recoveryText += `👤 Deleted by: @${deleterNumber}\n`;
-                recoveryText += `💬 Chat: ${isGroup ? 'Group' : 'Private'}\n\n`;
-                recoveryText += `📝 *Message:* `;
-                
-                const msgContent = savedMessage.message;
-                
-                if (msgContent.conversation) {
-                    recoveryText += msgContent.conversation;
-                } else if (msgContent.extendedTextMessage?.text) {
-                    recoveryText += msgContent.extendedTextMessage.text;
-                } else if (msgContent.imageMessage) {
-                    recoveryText += '_[Image with caption: ' + (msgContent.imageMessage.caption || 'none') + ']_';
-                } else if (msgContent.videoMessage) {
-                    recoveryText += '_[Video with caption: ' + (msgContent.videoMessage.caption || 'none') + ']_';
-                } else {
-                    recoveryText += '_[Media message]_';
-                }
-
-                await sock.sendMessage(chatId, {
-                    text: recoveryText,
-                    mentions: [deleterId]
-                });
-
-                console.log(`✅ [ANTIDELETE] Recovered deleted message in ${chatId}`);
-            } else {
-                console.log(`⚠️ [ANTIDELETE] No backup found for message ${messageId}`);
-            }
-        }
-    } catch (error) {
-        console.error('[ANTIDELETE] Error:', error.message);
-    }
-}
 export {
     handleMessages,
     handleGroupParticipantUpdate,
