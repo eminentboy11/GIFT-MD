@@ -72,7 +72,31 @@ if (type !== 'notify') return;
 const message = messages[0];  
     if (!message?.message) return;  
 
+    // === BACKUP MESSAGE FOR ANTIDELETE ===
+    const chatId = message.key.remoteJid;
+    const messageId = message.key.id;
+    
+    if (!global.messageBackup) global.messageBackup = {};
+    if (!global.messageBackup[chatId]) global.messageBackup[chatId] = {};
+    
+    global.messageBackup[chatId][messageId] = {
+        message: message.message,
+        key: message.key,
+        pushName: message.pushName,
+        timestamp: Math.floor(Date.now() / 1000)
+    };
+    
+    // Cleanup old messages (keep last 100 per chat)
+    const messageIds = Object.keys(global.messageBackup[chatId]);
+    if (messageIds.length > 100) {
+        const oldestId = messageIds[0];
+        delete global.messageBackup[chatId][oldestId];
+    }
+    // === END BACKUP ===
+
     const currentPrefix = global.prefix;
+    
+    // ... rest of your code
 
 const chatId = message.key.remoteJid;
 const senderId = message.key.participant || message.key.remoteJid;
@@ -409,90 +433,71 @@ async function handleStatus(sock, statusUpdate) {
     }
 }
 
-// Add this function
+    // === ANTIDELETE HANDLER ===
 export async function handleMessageDelete(sock, messageUpdate) {
     try {
         const antideleteMode = getSetting('antidelete_mode', 'off');
         
         if (antideleteMode === 'off') return;
 
-        const { messages } = messageUpdate;
-        
-        for (const msg of messages) {
+        for (const msg of messageUpdate.messages) {
             const chatId = msg.key.remoteJid;
             const messageId = msg.key.id;
             const deleterId = msg.key.participant || msg.key.remoteJid;
             
-            // Get owner number
+            // Skip if owner deleted
             const ownerNumber = getSetting('ownerNumber', '').split('@')[0];
             const deleterNumber = deleterId.split('@')[0].split(':')[0];
             
-            // Skip if owner deleted the message
             if (deleterNumber === ownerNumber) {
-                console.log('⏭️ Skipping owner deleted message');
+                console.log('⏭️ [ANTIDELETE] Skipping owner deleted message');
                 continue;
             }
 
-            // Check mode settings
+            // Check mode
             const isGroup = chatId.endsWith('@g.us');
             const isPM = !isGroup;
             
             if (antideleteMode === 'pm' && !isPM) continue;
             if (antideleteMode === 'gc' && !isGroup) continue;
             
-            // Try to recover from message backup
-            const backupKey = `${chatId}_${messageId}`;
+            // Recover message
             const savedMessage = global.messageBackup?.[chatId]?.[messageId];
             
             if (savedMessage) {
-                const deleterName = savedMessage.pushName || deleterNumber;
-                const chatType = isGroup ? 'Group' : 'Private';
-                
                 let recoveryText = `🗑️ *Anti-Delete Alert*\n\n`;
                 recoveryText += `👤 Deleted by: @${deleterNumber}\n`;
-                recoveryText += `💬 Chat Type: ${chatType}\n`;
-                recoveryText += `⏰ Time: ${new Date().toLocaleString()}\n\n`;
-                recoveryText += `📝 *Deleted Message:*\n`;
+                recoveryText += `💬 Chat: ${isGroup ? 'Group' : 'Private'}\n\n`;
+                recoveryText += `📝 *Message:* `;
                 
-                // Handle different message types
                 const msgContent = savedMessage.message;
                 
                 if (msgContent.conversation) {
                     recoveryText += msgContent.conversation;
                 } else if (msgContent.extendedTextMessage?.text) {
                     recoveryText += msgContent.extendedTextMessage.text;
-                } else if (msgContent.imageMessage?.caption) {
-                    recoveryText += msgContent.imageMessage.caption || '_Image_';
-                } else if (msgContent.videoMessage?.caption) {
-                    recoveryText += msgContent.videoMessage.caption || '_Video_';
                 } else if (msgContent.imageMessage) {
-                    recoveryText += '_[Image]_';
+                    recoveryText += '_[Image with caption: ' + (msgContent.imageMessage.caption || 'none') + ']_';
                 } else if (msgContent.videoMessage) {
-                    recoveryText += '_[Video]_';
-                } else if (msgContent.audioMessage) {
-                    recoveryText += '_[Audio]_';
-                } else if (msgContent.documentMessage) {
-                    recoveryText += '_[Document]_';
-                } else if (msgContent.stickerMessage) {
-                    recoveryText += '_[Sticker]_';
+                    recoveryText += '_[Video with caption: ' + (msgContent.videoMessage.caption || 'none') + ']_';
                 } else {
-                    recoveryText += '_[Unsupported message type]_';
+                    recoveryText += '_[Media message]_';
                 }
 
-                // Send recovery message
                 await sock.sendMessage(chatId, {
                     text: recoveryText,
                     mentions: [deleterId]
                 });
 
-                console.log(`✅ Recovered deleted message from ${deleterNumber} in ${chatId}`);
+                console.log(`✅ [ANTIDELETE] Recovered deleted message in ${chatId}`);
+            } else {
+                console.log(`⚠️ [ANTIDELETE] No backup found for message ${messageId}`);
             }
         }
     } catch (error) {
         console.error('[ANTIDELETE] Error:', error.message);
     }
 }
-
 export {
     handleMessages,
     handleGroupParticipantUpdate,
