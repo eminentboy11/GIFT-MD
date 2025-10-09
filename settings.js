@@ -2,26 +2,17 @@ const settings = {
 
   botName: "GIFT md",
 
-  ownerNumber: '2349059802473',
-    sudo: ["2348154853640"],
+  ownerNumber: '',
 
-  packname: 'Knight Bot',
+  packname: 'GIFT-MD',
 
   prefix: '.',
-
-  menuAudio: "off",
-
-frontTextStyle: "giftmd", // normal | bold | italic | mono
 
   defaultReaction: '✅',  // Fixed
 
   errorReaction: '❌',
 
-  version: "2.0.0",
-
  watermark: "©Gift md is on fire!🔥",
-
-  Mode: "private",
 
   botOwner: 'eminentboy', //Ur-Name
 
