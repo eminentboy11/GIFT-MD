@@ -1,4 +1,4 @@
-const settings = {
+ const settings = {
 
   botName: "GIFT md",
 
