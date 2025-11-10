@@ -63,14 +63,14 @@ src="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glo
       <td><a href="https://github.com/eminentboy11/GIFT-MD/archive/refs/heads/main.zip" target="_blank"><img src="https://img.shields.io/badge/Panel-File-CC00FF?style=for-the-badge&logo=huggingface&logoColor=white&labelColor=000000"/></a></td>
     </tr>
   </table>
-
-  <td><a href="https://subzeronodes.gleeze.com" target="_blank"><img src="https://img.shields.io/badge/SubzeroNodes-000000?style=for-the-badge&logo=bot-hosting&logoColor=white&labelColor=000000&color=blue"/></a></td>
+<td></a></td>
 </div>
 
 <div align="center">
-  <img src="https://github.com/eminentboy11/GIFT-MD/blob/main/assets/techwave.gif?raw=true" width="100%"/>
+  
 </div>
 <center>
+  
 
 </details>
 
@@ -84,7 +84,9 @@ src="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glo
 
 - This bot is made for educational purposes `only` hence `DO NOT MISUSE`.
 
-> `POWERED BY MR FRANK OFC 🇿🇼`
+>>`POWERED BY GIFT-MD`
+##
+>> `README BY MR FRANK OFC 🇿🇼`
 ##
 
 <a><img src='https://i.imgur.com/LyHic3i.gif'/>
