@@ -4,17 +4,11 @@
 
 <h1 align="center">𝗚𝗜𝗙𝗧 𝗠𝗗 </h1>
 
-
-
 <div align="center"> 
-  <a href="https://youtube.com/@officialgift-md?si=iO1QDVapbA8zx3ix"> 
-    <img src="https://files.catbox.moe/ratpfs.png" alt="GIFT MD" height="4000"> 
+  <a href="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glow_vkzjB5LvS-edi-xcXMIzvg_o9prOz_aTpGBmGV2TmFV7A.jpeg"> 
+    <img src="https://files.catbox.moe/uwouk6.jpeg" alt="GIFT MD" height="auto"> 
 </a> 
 </div>
-
-
-<img align="center" height="auto"
-src="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glow_vkzjB5LvS-edi-xcXMIzvg_o9prOz_aTpGBmGV2TmFV7A.jpeg">
 
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Rockstar-ExtraBold&color=506EF8&lines=WELCOME+TO+GIFT+MD;MADE+BY+ISAAC+FAVOUR;THANKS+FOR+VISITING+MY+REPO)](https://git.io/typing-svg)
 <br>
