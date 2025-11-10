@@ -5,8 +5,8 @@
 <h1 align="center">𝗚𝗜𝗙𝗧 𝗠𝗗 </h1>
 
 <div align="center"> 
-  <a href="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glow_vkzjB5LvS-edi-xcXMIzvg_o9prOz_aTpGBmGV2TmFV7A.jpeg"> 
-    <img src="https://files.catbox.moe/uwouk6.jpeg" alt="GIFT MD" height="auto"> 
+  <a href=""> 
+    <img src="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glow_vkzjB5LvS-edi-xcXMIzvg_o9prOz_aTpGBmGV2TmFV7A.jpeg" alt="GIFT MD" height="auto"> 
 </a> 
 </div>
 
