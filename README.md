@@ -1,3 +1,4 @@
+
 # 💫 GIFT-MD 💫
 <div align="center">
   <a href="https://git.io/typing-svg"> 
@@ -31,23 +32,28 @@ _Click the button below to fork Gift Md repository to your GitHub account_
   </a>
 </div>
 
+
+
 > 2:  **Get Pair Code**
 
-_Deploy the bot and easily connect it to your WhatsApp using the built-in pairing system — no external session id needed!_
-*Just follow these simple steps*
+Deploy your GIFT-MD bot and connect it to WhatsApp using your personal Session ID site — no external or manual setup needed!
+Follow these easy steps below
 👇
+<a href="https://gift-al5t.onrender.com/" target="_blank">
+  <img src="https://img.shields.io/badge/GET%20SESSION-100000?style=for-the-badge&logo=scan&logoColor=white&labelColor=darkblue&color=darkblue" alt="GET SESSION"/>
+</a>
 
-1. Enter your phone number in the terminal (e.g. +234XXXXXXXXXX)
+2. Enter your WhatsApp number (without the country code)
 
-2. Wait for the 6-digit pairing code to appear
+3. Click “Generate Code”
 
-3. Open WhatsApp → Settings → Linked Devices → Link a Device
+4. Copy the 6-digit pairing code shown on the page
 
-4. Tap “Link with Code”
+5. Open WhatsApp → Settings → Linked Devices → Link a Device → Link with Code
 
-5. Enter the pairing code shown in your terminal
+6. Paste your pairing code
 
-6. ✅ Done! Your WhatsApp is now linked to the bot
+7. ✅ Done! Your WhatsApp is now securely linked to your GIFT-MD bot
 
 > 3: **DOWNLOAD BOT ZIP**
 
