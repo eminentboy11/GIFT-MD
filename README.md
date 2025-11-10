@@ -22,7 +22,7 @@ src="https://mrfrankk-cdn.hf.space/media/a-cute-futuristic-robot-typing-on-a-glo
 <a href="https://github.com/eminentboy11/GIFT-MD/"><img title="Size" src="https://img.shields.io/github/repo-size/eminentboy11/GIFT-MD?style=flat-square&color=green"></a>
 <a href="https://github.com/eminentboy11.svg"></a>&nbsp;&nbsp;</a>
 <a href="https://github.com/eminentboy11/GIFT-MD"Dev"><img title="PUBLIC-BOT" src="https://img.shields.io/static/v1?label=Language&message=English&style=flat-square&color=darkpink"></a> &nbsp;
-  <img src="https://komarev.com/ghpvc/?username=mrfr8nk&label=VIEWS&style=flat-square&color=blue" />
+  <img src="https://komarev.com/ghpvc/?username=eminentboy11&label=VIEWS&style=flat-square&color=blue" />
 </a>
 <p align="center">
   <a href="https://github.com/eminentboy11/GIFT-MD"><img title="Release" src="https://img.shields.io/badge/Release-beta%20v5.0.0-darkcyan.svg?style=for-the-badge&logo=appveyor" /></a>
